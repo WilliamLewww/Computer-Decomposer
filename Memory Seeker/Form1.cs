@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Memory_Seeker
@@ -66,6 +67,28 @@ namespace Memory_Seeker
                 }
 
                 textBox3.Text = address;
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            Thread thread = new Thread(new ThreadStart(ScrambleThread));
+            thread.Start();
+        }
+
+        private void ScrambleThread()
+        {
+            Dictionary<string, int> addressList = kernel.SearchAllMemory(textBox2.Text, 2147418111);
+
+            int scrambledCount = 0;
+            foreach (KeyValuePair<string, int> pair in addressList)
+            {
+                kernel.WriteMemory(textBox2.Text, int.Parse(pair.Key.Substring(2), System.Globalization.NumberStyles.HexNumber), pair.Value + 1);
+
+                scrambledCount += 1;
+                Console.WriteLine(scrambledCount);
+
+                Thread.Sleep(2);
             }
         }
     }
